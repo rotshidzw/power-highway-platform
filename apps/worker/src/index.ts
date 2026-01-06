@@ -1,9 +1,12 @@
 import { Queue, Worker } from 'bullmq';
-import IORedis from 'ioredis';
 import { calculateWheelingFee } from '@nph/contracts';
 import { createEntry, verifyChain } from '@nph/ledger';
 
-const connection = new IORedis(process.env.REDIS_URL ?? 'redis://localhost:6379');
+const redisUrl = new URL(process.env.REDIS_URL ?? 'redis://localhost:6379');
+const connection = {
+  host: redisUrl.hostname,
+  port: Number(redisUrl.port) || 6379,
+};
 
 const billingQueue = new Queue('billing', { connection });
 const analyticsQueue = new Queue('analytics', { connection });

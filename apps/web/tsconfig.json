@@ -4,5 +4,5 @@
     "jsx": "preserve",
     "incremental": true
   },
-  "include": ["next-env.d.ts", "app", "components"]
+  "include": ["next-env.d.ts", "app", "components", "lib", "middleware.ts"]
 }
