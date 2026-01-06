@@ -1,0 +1,23 @@
+{
+  "name": "@nph/worker",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "ts-node src/index.ts",
+    "build": "tsc -p tsconfig.json",
+    "lint": "eslint src --max-warnings=0",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@nph/contracts": "workspace:*",
+    "@nph/db": "workspace:*",
+    "@nph/ledger": "workspace:*",
+    "bullmq": "^5.12.0",
+    "ioredis": "^5.4.1"
+  },
+  "devDependencies": {
+    "ts-node": "^10.9.2",
+    "vitest": "^2.0.5"
+  }
+}
