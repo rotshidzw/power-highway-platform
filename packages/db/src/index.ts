@@ -1,15 +1,15 @@
-import { PrismaClient } from '@prisma/client';
+import { Prisma, PrismaClient } from '@prisma/client';
 
 export const prisma = new PrismaClient();
 
 export const corridorRepository = {
   list: () => prisma.gridCorridor.findMany(),
-  create: (data: Parameters<typeof prisma.gridCorridor.create>[0]['data']) =>
+  create: (data: Prisma.GridCorridorCreateInput) =>
     prisma.gridCorridor.create({ data }),
 };
 
 export const contractRepository = {
   list: () => prisma.wheelingContract.findMany(),
-  create: (data: Parameters<typeof prisma.wheelingContract.create>[0]['data']) =>
+  create: (data: Prisma.WheelingContractCreateInput) =>
     prisma.wheelingContract.create({ data }),
 };

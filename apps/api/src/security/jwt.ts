@@ -1,4 +1,4 @@
-import jwt, { type Secret } from 'jsonwebtoken';
+import jwt, { type Secret, type SignOptions } from 'jsonwebtoken';
 
 export type TokenPayload = {
   sub: string;
@@ -7,9 +7,11 @@ export type TokenPayload = {
   type: 'access' | 'refresh';
 };
 
-const JWT_SECRET: Secret = process.env.JWT_SECRET ?? 'nph-dev-secret';
-const ACCESS_EXPIRES_IN = process.env.JWT_ACCESS_EXPIRES_IN ?? '15m';
-const REFRESH_EXPIRES_IN = process.env.JWT_REFRESH_EXPIRES_IN ?? '7d';
+const JWT_SECRET: Secret = process.env.JWT_SECRET ?? 'dev_insecure_secret_change_me';
+const ACCESS_EXPIRES_IN: SignOptions['expiresIn'] =
+  (process.env.ACCESS_EXPIRES_IN ?? '15m') as SignOptions['expiresIn'];
+const REFRESH_EXPIRES_IN: SignOptions['expiresIn'] =
+  (process.env.REFRESH_EXPIRES_IN ?? '7d') as SignOptions['expiresIn'];
 
 export const signAccessToken = (payload: Omit<TokenPayload, 'type'>): string =>
   jwt.sign({ ...payload, type: 'access' }, JWT_SECRET, { expiresIn: ACCESS_EXPIRES_IN });
