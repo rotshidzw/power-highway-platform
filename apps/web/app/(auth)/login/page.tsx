@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 
 const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? 'http://localhost:3001';
@@ -19,8 +19,21 @@ export default function LoginPage() {
   const [password, setPassword] = useState('password123');
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [apiStatus, setApiStatus] = useState<'checking' | 'online' | 'offline'>('checking');
 
   const nextPath = searchParams.get('next') ?? '/app/dashboard';
+
+  useEffect(() => {
+    const checkApi = async () => {
+      try {
+        const response = await fetch(`${apiBaseUrl}/v1/health`, { cache: 'no-store' });
+        setApiStatus(response.ok ? 'online' : 'offline');
+      } catch {
+        setApiStatus('offline');
+      }
+    };
+    checkApi();
+  }, []);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -39,7 +52,11 @@ export default function LoginPage() {
       }
       router.replace(nextPath);
     } catch (submitError) {
-      setError(submitError instanceof Error ? submitError.message : 'Unable to sign in.');
+      if (submitError instanceof Error && submitError.message === 'Failed to fetch') {
+        setError('Unable to reach the API. Confirm the API server is running on port 3001.');
+      } else {
+        setError(submitError instanceof Error ? submitError.message : 'Unable to sign in.');
+      }
     } finally {
       setLoading(false);
     }
@@ -51,6 +68,13 @@ export default function LoginPage() {
       <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
         Access the national transmission operations platform.
       </p>
+      <div className="mt-4 rounded-xl border border-dashed border-slate-200 bg-slate-50 px-4 py-3 text-xs text-slate-500 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-400">
+        {apiStatus === 'checking' && <span>Checking API connectivity...</span>}
+        {apiStatus === 'online' && <span>API status: online.</span>}
+        {apiStatus === 'offline' && (
+          <span>API status: offline. Start the API service or update NEXT_PUBLIC_API_BASE_URL.</span>
+        )}
+      </div>
       <form className="mt-6 space-y-4" onSubmit={handleSubmit}>
         <div>
           <label className="text-sm font-medium text-slate-600 dark:text-slate-300" htmlFor="email">
