@@ -6,8 +6,8 @@ export const config = {
   matcher: ['/app/:path*'],
 };
 
-export function middleware(request: NextRequest) {
-  const session = getSessionFromHeader(request.headers.get('cookie'));
+export async function middleware(request: NextRequest) {
+  const session = await getSessionFromHeader(request.headers.get('cookie'));
   const nextUrl = request.nextUrl.clone();
 
   if (!session) {

@@ -26,7 +26,7 @@ export const AppTopbar = ({ session, onToggleSidebar }: AppTopbarProps) => {
         <div>
           <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Tenant</p>
           <div className="flex items-center gap-2 text-sm font-semibold text-slate-900 dark:text-slate-100">
-            Org {session.orgId}
+            {session.orgName ?? 'Power Highway'}
             <ChevronDown className="h-4 w-4 text-slate-400" />
           </div>
         </div>

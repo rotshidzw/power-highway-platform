@@ -8,7 +8,7 @@ import { AppModule } from './modules/app.module';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.use(helmet());
-  app.enableCors({ origin: [/localhost:\d+$/] });
+  app.enableCors({ origin: [/localhost:\d+$/], credentials: true });
   app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
   app.setGlobalPrefix('v1');
 

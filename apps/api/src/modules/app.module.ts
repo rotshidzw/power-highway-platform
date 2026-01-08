@@ -6,6 +6,7 @@ import { LinesController } from '../routes/lines.controller';
 import { EnergyFlowsController } from '../routes/energy-flows.controller';
 import { InvoicesController } from '../routes/invoices.controller';
 import { AdminController } from '../routes/admin.controller';
+import { AuthController } from '../routes/auth.controller';
 import { AuditMiddleware } from '../security/audit.middleware';
 
 @Module({
@@ -17,6 +18,7 @@ import { AuditMiddleware } from '../security/audit.middleware';
     EnergyFlowsController,
     InvoicesController,
     AdminController,
+    AuthController,
   ],
 })
 export class AppModule implements NestModule {

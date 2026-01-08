@@ -9,6 +9,10 @@ const mock = getMockData();
 
 export default function AdminUsersPage() {
   const [showInvite, setShowInvite] = useState(false);
+  const accessRequests = [
+    { id: 'req-1', orgName: 'Eastern Renewables', name: 'Eastern Renewables Procurement', email: 'procurement@easternrenewables.co.za', department: 'Procurement' },
+    { id: 'req-2', orgName: 'Metro Energy', name: 'Metro Energy Legal', email: 'legal@metroenergy.co.za', department: 'Legal' },
+  ];
 
   return (
     <div className="space-y-6">
@@ -50,6 +54,39 @@ export default function AdminUsersPage() {
             ))}
           </tbody>
         </table>
+      </div>
+
+      <div className="card">
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <h2 className="text-lg font-semibold text-slate-900 dark:text-white">Pending access requests</h2>
+            <p className="text-sm text-slate-500 dark:text-slate-400">
+              Approve onboarding requests so teams can access operational workflows.
+            </p>
+          </div>
+          <button className="btn btn-secondary" type="button">
+            Review queue
+          </button>
+        </div>
+        <div className="mt-4 space-y-3 text-sm">
+          {accessRequests.map((request) => (
+            <div key={request.id} className="flex flex-wrap items-center justify-between gap-4 rounded-xl border border-slate-200/60 p-4 dark:border-slate-800">
+              <div>
+                <p className="font-medium text-slate-900 dark:text-white">{request.orgName}</p>
+                <p className="text-xs text-slate-400">{request.name} • {request.department}</p>
+                <p className="text-xs text-slate-400">{request.email}</p>
+              </div>
+              <div className="flex gap-2">
+                <button className="btn btn-secondary" type="button">
+                  Decline
+                </button>
+                <button className="btn btn-primary" type="button">
+                  Approve
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
 
       {showInvite && (

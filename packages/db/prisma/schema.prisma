@@ -12,11 +12,29 @@ model User {
   email      String    @unique
   fullName   String
   orgName    String?
+  role       String    @default("WORKER")
+  status     String    @default("PENDING")
+  passwordHash String?
+  lastLoginAt DateTime?
   isActive   Boolean   @default(true)
   createdAt  DateTime  @default(now())
   updatedAt  DateTime  @updatedAt
   roles      UserRole[]
   auditLogs  AuditLog[]
+}
+
+model AccessRequest {
+  id          String   @id @default(uuid())
+  email       String
+  fullName    String
+  orgName     String
+  department  String?
+  status      String   @default("PENDING")
+  requestedAt DateTime @default(now())
+  reviewedAt  DateTime?
+  reviewerId  String?
+
+  reviewer User? @relation(fields: [reviewerId], references: [id])
 }
 
 model Role {
