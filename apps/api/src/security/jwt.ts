@@ -1,4 +1,4 @@
-import jwt from 'jsonwebtoken';
+import jwt, { type Secret } from 'jsonwebtoken';
 
 export type TokenPayload = {
   sub: string;
@@ -7,7 +7,7 @@ export type TokenPayload = {
   type: 'access' | 'refresh';
 };
 
-const JWT_SECRET = process.env.JWT_SECRET ?? 'nph-dev-secret';
+const JWT_SECRET: Secret = process.env.JWT_SECRET ?? 'nph-dev-secret';
 const ACCESS_EXPIRES_IN = process.env.JWT_ACCESS_EXPIRES_IN ?? '15m';
 const REFRESH_EXPIRES_IN = process.env.JWT_REFRESH_EXPIRES_IN ?? '7d';
 
