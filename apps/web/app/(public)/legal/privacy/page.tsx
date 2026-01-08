@@ -2,13 +2,13 @@ import React from 'react';
 
 export default function PrivacyPage() {
   return (
-    <div className="container page-section">
-      <h1>Privacy Policy</h1>
-      <p>
+    <div className="mx-auto max-w-5xl px-6 py-16 text-slate-100">
+      <h1 className="text-3xl font-semibold">Privacy Policy</h1>
+      <p className="mt-4 text-slate-300">
         Power Highway only collects operational data necessary to support grid operations, wheeling
         contracts, and auditing.
       </p>
-      <div className="card" style={{ marginTop: 24 }}>
+      <div className="card mt-8 space-y-3 text-sm text-slate-500 dark:text-slate-400">
         <p>We apply strict access controls based on user role and tenant.</p>
         <p>Data retention aligns with regulatory requirements.</p>
         <p>Contact privacy@powerhighway.co.za for information requests.</p>
