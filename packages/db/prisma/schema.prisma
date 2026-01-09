@@ -21,6 +21,10 @@ model User {
   updatedAt  DateTime  @updatedAt
   roles      UserRole[]
   auditLogs  AuditLog[]
+  accessRequestsReviewed AccessRequest[]
+  transmissionLinesOwned TransmissionLine[]
+  powerPlantsOwned PowerPlant[]
+  buyerOrgsOwned BuyerOrg[]
 }
 
 model AccessRequest {
@@ -182,6 +186,7 @@ model Invoice {
   createdAt   DateTime @default(now())
   contract    WheelingContract? @relation(fields: [contractId], references: [id])
   lineItems   InvoiceLineItem[]
+  payments    Payment[]
 }
 
 model InvoiceLineItem {
