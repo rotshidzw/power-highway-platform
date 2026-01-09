@@ -1,0 +1,230 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id         String    @id @default(uuid())
+  email      String    @unique
+  fullName   String
+  orgName    String?
+  role       String    @default("WORKER")
+  status     String    @default("PENDING")
+  passwordHash String?
+  lastLoginAt DateTime?
+  isActive   Boolean   @default(true)
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  roles      UserRole[]
+  auditLogs  AuditLog[]
+  accessRequestsReviewed AccessRequest[]
+  transmissionLinesOwned TransmissionLine[]
+  powerPlantsOwned PowerPlant[]
+  buyerOrgsOwned BuyerOrg[]
+}
+
+model AccessRequest {
+  id          String   @id @default(uuid())
+  email       String
+  fullName    String
+  orgName     String
+  department  String?
+  status      String   @default("PENDING")
+  requestedAt DateTime @default(now())
+  reviewedAt  DateTime?
+  reviewerId  String?
+
+  reviewer User? @relation(fields: [reviewerId], references: [id])
+}
+
+model Role {
+  id          String     @id @default(uuid())
+  name        String     @unique
+  description String?
+  users       UserRole[]
+  createdAt   DateTime   @default(now())
+}
+
+model UserRole {
+  userId     String
+  roleId     String
+  assignedAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role Role @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  @@id([userId, roleId])
+}
+
+model FeatureFlag {
+  id          String   @id @default(uuid())
+  key         String   @unique
+  description String?
+  enabled     Boolean  @default(false)
+  createdAt   DateTime @default(now())
+}
+
+model GridCorridor {
+  id                String     @id @default(uuid())
+  name              String
+  originRegion      String
+  destinationRegion String
+  status            String
+  geometry          Unsupported("geometry")
+  createdAt         DateTime   @default(now())
+  updatedAt         DateTime   @updatedAt
+  lines             TransmissionLine[]
+  tariffs           Tariff[]
+  contracts         WheelingContract[]
+}
+
+model TransmissionLine {
+  id         String   @id @default(uuid())
+  corridorId String?
+  ownerId    String?
+  name       String
+  capacityMw Float
+  voltageKv  Float?
+  lengthKm   Float?
+  status     String
+  geometry   Unsupported("geometry")
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  corridor GridCorridor? @relation(fields: [corridorId], references: [id])
+  owner    User?         @relation(fields: [ownerId], references: [id])
+}
+
+model PowerPlant {
+  id         String   @id @default(uuid())
+  ownerId    String?
+  name       String
+  technology String
+  capacityMw Float
+  location   Unsupported("geometry")
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  owner      User?    @relation(fields: [ownerId], references: [id])
+  contracts  WheelingContract[]
+}
+
+model BuyerOrg {
+  id        String   @id @default(uuid())
+  ownerId   String?
+  name      String
+  sector    String?
+  location  Unsupported("geometry")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  owner     User?    @relation(fields: [ownerId], references: [id])
+  contracts WheelingContract[]
+}
+
+model Tariff {
+  id          String   @id @default(uuid())
+  corridorId  String?
+  name        String
+  ratePerKwh  Float
+  ratePerKm   Float
+  currency    String   @default("ZAR")
+  effectiveFrom DateTime
+  effectiveTo   DateTime?
+  createdAt   DateTime @default(now())
+  corridor    GridCorridor? @relation(fields: [corridorId], references: [id])
+  contracts   WheelingContract[]
+}
+
+model WheelingContract {
+  id                   String   @id @default(uuid())
+  producerId           String?
+  buyerId              String?
+  corridorId           String?
+  tariffId             String?
+  contractTermYears    Int
+  contractedCapacityMw Float
+  startDate            DateTime
+  endDate              DateTime
+  status               String
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+
+  producer PowerPlant? @relation(fields: [producerId], references: [id])
+  buyer    BuyerOrg?   @relation(fields: [buyerId], references: [id])
+  corridor GridCorridor? @relation(fields: [corridorId], references: [id])
+  tariff   Tariff?     @relation(fields: [tariffId], references: [id])
+  energyFlows EnergyFlow[]
+  invoices  Invoice[]
+}
+
+model EnergyFlow {
+  id           String   @id @default(uuid())
+  contractId   String?
+  corridorId   String?
+  producerId   String?
+  buyerId      String?
+  energyKwh    Float
+  distanceKm   Float
+  flowTimestamp DateTime
+  ledgerHash   String
+  previousHash String?
+  createdAt    DateTime @default(now())
+
+  contract WheelingContract? @relation(fields: [contractId], references: [id])
+}
+
+model Invoice {
+  id          String   @id @default(uuid())
+  contractId  String?
+  billingPeriod String
+  totalAmount Float
+  currency    String   @default("ZAR")
+  status      String
+  createdAt   DateTime @default(now())
+  contract    WheelingContract? @relation(fields: [contractId], references: [id])
+  lineItems   InvoiceLineItem[]
+  payments    Payment[]
+}
+
+model InvoiceLineItem {
+  id        String   @id @default(uuid())
+  invoiceId String
+  description String
+  amount    Float
+  createdAt DateTime @default(now())
+  invoice   Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+}
+
+model Payment {
+  id        String   @id @default(uuid())
+  invoiceId String?
+  amount    Float
+  currency  String  @default("ZAR")
+  status    String
+  paidAt    DateTime?
+  createdAt DateTime @default(now())
+  invoice   Invoice? @relation(fields: [invoiceId], references: [id])
+}
+
+model AuditLog {
+  id         String   @id @default(uuid())
+  actorId    String?
+  action     String
+  entityType String
+  entityId   String?
+  metadata   Json     @default("{}")
+  createdAt  DateTime @default(now())
+  actor      User?    @relation(fields: [actorId], references: [id])
+}
+
+model DailyKpiRollup {
+  id          String   @id @default(uuid())
+  day         DateTime @unique
+  corridorId  String?
+  utilization Float
+  totalEnergyKwh Float
+  createdAt   DateTime @default(now())
+}
