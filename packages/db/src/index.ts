@@ -8,14 +8,18 @@ type CreateData<T> = T extends { create(args: infer A): unknown }
     : never
   : never;
 
+type CreateDelegate<T> = {
+  create: (args: { data: CreateData<T> }) => unknown;
+};
+
 export const corridorRepository = {
   list: () => prisma.gridCorridor.findMany(),
   create: (data: CreateData<typeof prisma.gridCorridor>) =>
-    prisma.gridCorridor.create({ data }),
+    (prisma.gridCorridor as CreateDelegate<typeof prisma.gridCorridor>).create({ data }),
 };
 
 export const contractRepository = {
   list: () => prisma.wheelingContract.findMany(),
   create: (data: CreateData<typeof prisma.wheelingContract>) =>
-    prisma.wheelingContract.create({ data }),
+    (prisma.wheelingContract as CreateDelegate<typeof prisma.wheelingContract>).create({ data }),
 };
